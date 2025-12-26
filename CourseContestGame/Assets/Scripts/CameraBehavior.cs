@@ -4,17 +4,11 @@ public class CameraBehavior : MonoBehaviour
 {
     public Vector3 farOffset = new Vector3(-2.5f, 1.5f, -5f);
     public Vector3 nearOffset = new Vector3(-1.75f, 1.4f, -3f);
-
     public float smoothSpeed = 6f;
-
     private Transform target;
-
-    private bool isZooming = false;
     public bool isLeftShoulder = false;
-
     private Vector3 desiredOffset;
     private Vector3 currentOffset;
-
     public GameObject Crosshair;
 
     void Start()
@@ -28,11 +22,11 @@ public class CameraBehavior : MonoBehaviour
 
         if (Input.GetMouseButton(1))
         {
-            isZooming = true;
+            desiredOffset = nearOffset;
         }
         else
         {
-            isZooming = false;
+            desiredOffset = farOffset;
         }
 
         RectTransform rt = Crosshair.GetComponent<RectTransform>();
@@ -53,17 +47,6 @@ public class CameraBehavior : MonoBehaviour
             rt.anchoredPosition = pos;
         }
 
-
-        if (isZooming == true)
-        {
-            desiredOffset = nearOffset;
-        }
-        else
-        {
-            desiredOffset = farOffset;
-        }
-
-
         if (isLeftShoulder == true)
         {
             desiredOffset.x = -Mathf.Abs(desiredOffset.x);
@@ -73,7 +56,7 @@ public class CameraBehavior : MonoBehaviour
             desiredOffset.x = Mathf.Abs(desiredOffset.x);
         }
 
-        // Smooth camera movement
+        //For smooth camera movement we can use commented one as well.
         currentOffset = Vector3.Lerp(currentOffset, desiredOffset, smoothSpeed * Time.deltaTime);
         //currentOffset = desiredOffset;
 
