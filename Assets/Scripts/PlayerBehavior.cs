@@ -51,9 +51,14 @@ public class PlayerBehavior : MonoBehaviour
     public GameObject dieScreen;
 
     public bool isMelee;
-    private bool isAttacking;
     private float attackTimer;
     public int currentAttack;
+
+    public float maxStamina = 100;
+    public float currentStamina;
+    public TMP_Text staminaText;
+    public float staminaRegenModifier = 5f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -62,17 +67,28 @@ public class PlayerBehavior : MonoBehaviour
         bulletRemaining = bulletMax;
         jumpCount = maxJump;
         currentHealth = maxHealth;
-
+        currentStamina = maxStamina;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
     }
 
     void Update()
     {
+        if(currentStamina < maxStamina)
+        {
+            currentStamina += Time.deltaTime*staminaRegenModifier;
+            staminaText.text = currentStamina.ToString();
+        }
         if (Input.GetKeyDown(KeyCode.C))
         {
             Hide();
             hidePressAmount++;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab)) 
+        {
+            isMelee = !isMelee;
         }
 
         vInput = Input.GetAxis("Vertical");
@@ -248,21 +264,22 @@ public class PlayerBehavior : MonoBehaviour
 
     public void Attack()
     {
-        if(Input.GetMouseButton(0) && attackTimer > 0.8f)
+        if(Input.GetMouseButton(0) && attackTimer > 0.8f && currentStamina>=10)
         {
             currentAttack++;
             if (currentAttack > 3)
             {
-                Debug.Log("a");
                 currentAttack = 1;
             }
             if (attackTimer > 1)
             {
-                Debug.Log("b");
                 currentAttack = 1;
             }
-            Debug.Log(currentAttack);
             anim.SetTrigger("Attack"+currentAttack);
+            currentStamina -= 10;
+            if (currentStamina <= 0)
+                currentStamina = 0;
+            staminaText.text = currentStamina.ToString();
             attackTimer = 0;
         }
     }
