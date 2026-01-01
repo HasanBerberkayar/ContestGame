@@ -53,13 +53,7 @@ public class PlayerBehavior : MonoBehaviour
     public bool isMelee;
     private bool isAttacking;
     private float attackTimer;
-    public float attackRate;
-    private float lastClickTime;
-    public int numOfClicks;
-
-    private int comboStep = 0;
-    public float comboInputWindow = 0.8f;
-    private float comboTimer = 0f;
+    public int currentAttack;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -92,8 +86,9 @@ public class PlayerBehavior : MonoBehaviour
         }
         else
         {
-            isAttacking |= Input.GetMouseButtonDown(0);
+            Attack();
         }
+        attackTimer += Time.deltaTime;
 
         isWalking = Mathf.Abs(vInput) > 0.01f || Mathf.Abs(hInput) > 0.01f;
 
@@ -118,11 +113,6 @@ public class PlayerBehavior : MonoBehaviour
 
         if (fireTimer > 0f)
             fireTimer -= Time.deltaTime;
-
-        if(attackTimer > 0f)
-        {
-            attackTimer -= Time.deltaTime;
-        }
 
         if (Input.GetKeyDown(KeyCode.R) && !isReloading)
             isReloading = true;
@@ -156,7 +146,6 @@ public class PlayerBehavior : MonoBehaviour
         Move();
         Jump();
         Shoot();
-        Attack();
     }
 
     private void RotateWithCamera()
@@ -259,31 +248,22 @@ public class PlayerBehavior : MonoBehaviour
 
     public void Attack()
     {
-        if (!isAttacking) return;
-
-        if (comboStep == 0)
+        if(Input.GetMouseButton(0) && attackTimer > 0.8f)
         {
-            anim.SetTrigger("Attack");
-            comboStep = 1;
-            comboTimer = comboInputWindow;
+            currentAttack++;
+            if (currentAttack > 3)
+            {
+                Debug.Log("a");
+                currentAttack = 1;
+            }
+            if (attackTimer > 1)
+            {
+                Debug.Log("b");
+                currentAttack = 1;
+            }
+            Debug.Log(currentAttack);
+            anim.SetTrigger("Attack"+currentAttack);
+            attackTimer = 0;
         }
-        else if (comboStep == 1)
-        {
-            anim.SetTrigger("Attack2");
-            comboStep = 2;
-            comboTimer = comboInputWindow;
-        }
-        else if (comboStep == 2)
-        {
-            anim.SetTrigger("Attack3");
-            comboStep = 3;
-            comboTimer = comboInputWindow;
-        }
-        else
-        {
-            comboStep = 0;
-        }
-
-        isAttacking = false;
     }
 }
